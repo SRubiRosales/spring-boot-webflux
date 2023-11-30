@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Flux;
 
+import java.util.Date;
+
 @SpringBootApplication
 public class WebfluxApplication implements CommandLineRunner {
 
@@ -42,7 +44,10 @@ public class WebfluxApplication implements CommandLineRunner {
 				new Producto("Mica Comoda 5 cajones", 150.89),
 				new Producto("TV Sony Bravia 4K Ultra HD", 2255.89)
 			)
-			.flatMap(producto -> dao.save(producto))
+			.flatMap(producto -> {
+				producto.setCreateAt(new Date());
+				return dao.save(producto);
+			})
 			.subscribe(productoMono -> log.info("Insert: " + productoMono.getId() + " " + productoMono.getNombre()));
 	}
 }
