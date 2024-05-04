@@ -12,12 +12,12 @@ public class ProductoServicioImpl implements ProductoServicio{
     @Autowired
     private ProductoDao dao;
     @Override
-    public Flux<Producto> findAll() {
+    public Flux<Producto> listar() {
         return dao.findAll();
     }
 
     @Override
-    public Flux<Producto> findAllConNombreMayusculas() {
+    public Flux<Producto> listarConNombreMayusculas() {
         return dao.findAll().map(producto -> {
             producto.setNombre(producto.getNombre().toUpperCase());
             return producto;
@@ -25,8 +25,8 @@ public class ProductoServicioImpl implements ProductoServicio{
     }
 
     @Override
-    public Flux<Producto> findAllConNombreMayusculasRepetir() {
-        return findAllConNombreMayusculas().repeat(5000);
+    public Flux<Producto> listarConNombreMayusculasRepetir() {
+        return listarConNombreMayusculas().repeat(5000);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ProductoServicioImpl implements ProductoServicio{
     }
 
     @Override
-    public Mono<Producto> save(Producto producto) {
+    public Mono<Producto> guardar(Producto producto) {
         return dao.save(producto);
     }
 

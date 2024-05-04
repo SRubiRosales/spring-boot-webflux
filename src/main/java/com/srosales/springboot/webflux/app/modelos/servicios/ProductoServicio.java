@@ -5,10 +5,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ProductoServicio {
-    public Flux<Producto> findAll();
-    public Flux<Producto> findAllConNombreMayusculas();
-    public Flux<Producto> findAllConNombreMayusculasRepetir();
+    public Flux<Producto> listar();
+    public Flux<Producto> listarConNombreMayusculas();
+    public Flux<Producto> listarConNombreMayusculasRepetir();
     public Mono<Producto> findById(String id);
-    public Mono<Producto> save(Producto producto);
+    public Mono<Producto> guardar(Producto producto);
     public Mono<Void> delete(Producto producto);
 }
