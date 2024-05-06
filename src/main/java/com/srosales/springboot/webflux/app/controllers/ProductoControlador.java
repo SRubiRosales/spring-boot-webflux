@@ -37,7 +37,7 @@ public class ProductoControlador {
     public Mono<String> crear(Model model) {
         model.addAttribute("producto", new Producto());
         model.addAttribute("titulo", "Producto");
-        return Mono.just("form");
+        return Mono.just("formulario");
     }
 
     @PostMapping("/form")
