@@ -30,7 +30,7 @@ public class ProductoServicioImpl implements ProductoServicio{
     }
 
     @Override
-    public Mono<Producto> findById(String id) {
+    public Mono<Producto> encontrarPorId(String id) {
         return dao.findById(id);
     }
 

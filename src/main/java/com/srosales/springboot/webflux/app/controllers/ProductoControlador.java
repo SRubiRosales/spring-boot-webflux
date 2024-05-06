@@ -1,6 +1,5 @@
 package com.srosales.springboot.webflux.app.controllers;
 
-import com.srosales.springboot.webflux.app.modelos.dao.ProductoDao;
 import com.srosales.springboot.webflux.app.modelos.documentos.Producto;
 import com.srosales.springboot.webflux.app.modelos.servicios.ProductoServicio;
 import org.slf4j.Logger;
@@ -9,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.support.SessionStatus;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,6 +38,15 @@ public class ProductoControlador {
     public Mono<String> crear(Model model) {
         model.addAttribute("producto", new Producto());
         model.addAttribute("titulo", "Producto");
+        return Mono.just("formulario");
+    }
+    @GetMapping("/form/{id}")
+    public Mono<String> editar(@PathVariable String id, Model model) {
+        Mono<Producto> producto = servicio.encontrarPorId(id).doOnNext(p -> {
+            log.info("Producto encontrado: " + p.getNombre());
+        }).defaultIfEmpty(new Producto());
+        model.addAttribute("producto", producto);
+        model.addAttribute("titulo", "Editar Producto");
         return Mono.just("formulario");
     }
 
