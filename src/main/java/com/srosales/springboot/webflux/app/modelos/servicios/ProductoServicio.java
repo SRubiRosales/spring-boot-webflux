@@ -10,5 +10,5 @@ public interface ProductoServicio {
     public Flux<Producto> listarConNombreMayusculasRepetir();
     public Mono<Producto> encontrarPorId(String id);
     public Mono<Producto> guardar(Producto producto);
-    public Mono<Void> delete(Producto producto);
+    public Mono<Void> eliminar(Producto producto);
 }

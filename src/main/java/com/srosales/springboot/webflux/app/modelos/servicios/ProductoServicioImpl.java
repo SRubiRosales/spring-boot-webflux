@@ -40,7 +40,7 @@ public class ProductoServicioImpl implements ProductoServicio{
     }
 
     @Override
-    public Mono<Void> delete(Producto producto) {
+    public Mono<Void> eliminar(Producto producto) {
         return dao.delete(producto);
     }
 }

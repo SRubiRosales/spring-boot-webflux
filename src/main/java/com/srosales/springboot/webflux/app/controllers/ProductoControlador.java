@@ -87,9 +87,26 @@ public class ProductoControlador {
             }
             return servicio.guardar(producto).doOnNext(p -> {
                 log.info("Producto guardado" + p.getNombre() + " Id: " + p.getId());
-            }).thenReturn("redirect:/listar?success=producto+guardado+con+exito");
+            }).thenReturn("redirect:/listar?exito=producto+guardado+con+exito");
         }
     }
+
+    @GetMapping("/eliminar/{id}")
+    public Mono<String> eliminar(@PathVariable String id) {
+        return servicio.encontrarPorId(id).defaultIfEmpty(new Producto())
+                .flatMap(p -> {
+                    if (p.getId() == null) {
+                        return Mono.error(new InterruptedException("El producto no existe"));
+                    }
+                    return Mono.just(p);
+                }).flatMap(producto -> {
+                    log.info("Eliminando producto " + producto.getNombre());
+                    log.info("Producto Id" + producto.getId());
+            return servicio.eliminar(producto);
+        }).then(Mono.just("redirect:/listar?exito=producto+eliminado+con+exito"))
+        .onErrorResume(e -> Mono.just("redirect:/listar?error=el+producto+a+eliminar+no+existe"));
+    }
+
     @GetMapping("/listar-datadriver")
     public String listarDataDriver(Model model) {
         Flux<Producto> productos = servicio.listarConNombreMayusculas().delayElements(Duration.ofSeconds(1));
