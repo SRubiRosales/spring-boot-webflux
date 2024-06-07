@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,9 @@ import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.time.Duration;
+import java.util.Date;
 
 @Controller
 public class ProductoControlador {
@@ -72,10 +75,20 @@ public class ProductoControlador {
     }
 
     @PostMapping("/form")
-    public Mono<String> guardar(Producto producto) {
-        return servicio.guardar(producto).doOnNext(p -> {
-            log.info("Producto guardado" + p.getNombre() + " Id: " + p.getId());
-        }).thenReturn("redirect:/listar");
+    public Mono<String> guardar(@Valid Producto producto, BindingResult result, Model model, SessionStatus status) {
+        if (result.hasErrors()) {
+            model.addAttribute("boton", "Guardar");
+            model.addAttribute("titulo", "Errores en formulario Producto");
+            return  Mono.just("formulario");
+        } else {
+            status.setComplete();
+            if (producto.getCreateAt()== null) {
+                producto.setCreateAt(new Date());
+            }
+            return servicio.guardar(producto).doOnNext(p -> {
+                log.info("Producto guardado" + p.getNombre() + " Id: " + p.getId());
+            }).thenReturn("redirect:/listar?success=producto+guardado+con+exito");
+        }
     }
     @GetMapping("/listar-datadriver")
     public String listarDataDriver(Model model) {
