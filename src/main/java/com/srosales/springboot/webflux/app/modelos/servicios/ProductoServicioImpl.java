@@ -1,6 +1,8 @@
 package com.srosales.springboot.webflux.app.modelos.servicios;
 
+import com.srosales.springboot.webflux.app.modelos.dao.CategoriaDao;
 import com.srosales.springboot.webflux.app.modelos.dao.ProductoDao;
+import com.srosales.springboot.webflux.app.modelos.documentos.Categoria;
 import com.srosales.springboot.webflux.app.modelos.documentos.Producto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,9 @@ import reactor.core.publisher.Mono;
 public class ProductoServicioImpl implements ProductoServicio{
     @Autowired
     private ProductoDao dao;
+
+    @Autowired
+    private CategoriaDao categoriaDao;
     @Override
     public Flux<Producto> listar() {
         return dao.findAll();
@@ -42,5 +47,20 @@ public class ProductoServicioImpl implements ProductoServicio{
     @Override
     public Mono<Void> eliminar(Producto producto) {
         return dao.delete(producto);
+    }
+
+    @Override
+    public Flux<Categoria> listarCategorias() {
+        return categoriaDao.findAll();
+    }
+
+    @Override
+    public Mono<Categoria> encontrarCategoriaPorId(String id) {
+        return categoriaDao.findById(id);
+    }
+
+    @Override
+    public Mono<Categoria> guardarCategoria(Categoria categoria) {
+        return categoriaDao.save(categoria);
     }
 }
