@@ -89,11 +89,16 @@ public class ProductoControlador {
             return  Mono.just("formulario");
         } else {
             status.setComplete();
-            if (producto.getCreateAt()== null) {
-                producto.setCreateAt(new Date());
-            }
-            return servicio.guardar(producto).doOnNext(p -> {
-                log.info("Producto guardado" + p.getNombre() + " Id: " + p.getId());
+            Mono<Categoria> categoria = servicio.encontrarCategoriaPorId(producto.getCategoria().getId());
+            return categoria.flatMap(c -> {
+                if (producto.getCreateAt()== null) {
+                    producto.setCreateAt(new Date());
+                }
+                producto.setCategoria(c);
+                return servicio.guardar(producto);
+                }).doOnNext(p -> {
+                    log.info("Categoria asignada: " + p.getCategoria().getNombre() + " Id Cat: " + p.getCategoria().getId());
+                    log.info("Producto guardado: " + p.getNombre() + " Id: " + p.getId());
             }).thenReturn("redirect:/listar?exito=producto+guardado+con+exito");
         }
     }
