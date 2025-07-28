@@ -1,5 +1,6 @@
 package com.srosales.springboot.webflux.app.controllers;
 
+import com.srosales.springboot.webflux.app.modelos.documentos.Categoria;
 import com.srosales.springboot.webflux.app.modelos.documentos.Producto;
 import com.srosales.springboot.webflux.app.modelos.servicios.ProductoServicio;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.support.SessionStatus;
@@ -26,6 +28,11 @@ public class ProductoControlador {
     private ProductoServicio servicio;
 
     private static final Logger log = LoggerFactory.getLogger(ProductoControlador.class);
+
+    @ModelAttribute("categorias")
+    public Flux<Categoria> categorias() {
+        return servicio.listarCategorias();
+    }
 
     @GetMapping({"/listar", "/"})
     public Mono<String> listar(Model model) {
