@@ -6,26 +6,30 @@ import com.srosales.springboot.webflux.app.modelos.servicios.ProductoServicio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.io.File;
 import java.time.Duration;
 import java.util.Date;
+import java.util.UUID;
 
 @Controller
 public class ProductoControlador {
     @Autowired
     private ProductoServicio servicio;
+
+    @Value("${config.uploads.path}")
+    private String ruta;
 
     private static final Logger log = LoggerFactory.getLogger(ProductoControlador.class);
 
@@ -82,7 +86,7 @@ public class ProductoControlador {
     }
 
     @PostMapping("/form")
-    public Mono<String> guardar(@Valid Producto producto, BindingResult result, Model model, SessionStatus status) {
+    public Mono<String> guardar(@Valid Producto producto, BindingResult result, Model model, @RequestPart(name = "archivo") FilePart file, SessionStatus status) {
         if (result.hasErrors()) {
             model.addAttribute("boton", "Guardar");
             model.addAttribute("titulo", "Errores en formulario Producto");
@@ -94,12 +98,24 @@ public class ProductoControlador {
                 if (producto.getCreateAt()== null) {
                     producto.setCreateAt(new Date());
                 }
+                if(!file.filename().isEmpty()) {
+                    producto.setFoto(UUID.randomUUID().toString() + "-" + file.filename()
+                            .replace(" ", "")
+                            .replace(":", "")
+                            .replace("\\", ""));
+                }
                 producto.setCategoria(c);
                 return servicio.guardar(producto);
                 }).doOnNext(p -> {
                     log.info("Categoria asignada: " + p.getCategoria().getNombre() + " Id Cat: " + p.getCategoria().getId());
                     log.info("Producto guardado: " + p.getNombre() + " Id: " + p.getId());
-            }).thenReturn("redirect:/listar?exito=producto+guardado+con+exito");
+            }).flatMap(p -> {
+                if (!file.filename().isEmpty()) {
+                    return file.transferTo(new File(ruta + p.getFoto()));
+                }
+                return Mono.empty();
+                    })
+                    .thenReturn("redirect:/listar?exito=producto+guardado+con+exito");
         }
     }
 

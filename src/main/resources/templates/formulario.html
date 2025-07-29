@@ -8,9 +8,12 @@
     <h1 th:text="${titulo}"></h1>
     <a th:href="@{/listar}">Listar</a>
     <div>
-        <form th:action="@{/form}" method="POST" th:object="${producto}">
+        <form th:action="@{/form}" method="POST" th:object="${producto}" enctype="multipart/form-data">
             <div>
                 <input th:if="${producto.id != null}" type="hidden" th:field="*{id}">
+            </div>
+            <div>
+                <input th:if="${producto.foto != null}" type="hidden" th:field="*{foto}">
             </div>
             <div>
                 <label for="nombre">Nombre</label>
@@ -35,6 +38,10 @@
                     </select>
                 </div>
                 <small th:if="${#fields.hasErrors('categoria.id')}" th:errors="*{categoria.id}"></small>
+            </div>
+            <div>
+                <label for="archivo">Imagen</label>
+                <div><input id="archivo" type="file" name="archivo"/></div>
             </div>
             <div>
                 <div><input type="submit" th:value="${boton}"/></div>
