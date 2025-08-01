@@ -47,6 +47,21 @@ public class ProductoControlador {
         model.addAttribute("titulo", "Lista de productos");
         return Mono.just("listar");
     }
+    @GetMapping("/ver/{id}")
+    public Mono<String> ver(Model model, @PathVariable String id) {
+        return servicio.encontrarPorId(id)
+                .doOnNext(producto -> {
+                    model.addAttribute("producto", producto);
+                    model.addAttribute("titulo", "Detalle Producto" + producto.getId());
+                }).switchIfEmpty(Mono.just(new Producto()))
+                .flatMap(producto -> {
+                    if (producto.getId() == null) {
+                        return Mono.error(new InterruptedException("No existe el producto"));
+                    }
+                    return Mono.just(producto);
+                }).then(Mono.just("ver"))
+                .onErrorResume(ex -> Mono.just("redirect:listar?error=el+producto+no+existe"));
+    }
 
     @GetMapping("/form")
     public Mono<String> crear(Model model) {
